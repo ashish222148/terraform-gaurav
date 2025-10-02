@@ -1,0 +1,171 @@
+How to set path of terraform binary in linux environment:
+    1-go to to the path where binary is downloaded
+        export PATH=$PATH:$(pwd)
+    2-move the terraform binary to the PATh location
+        sudo cp terraform /usr/local/bin 
+
+terraform also also able to read the fille which is written in json and extansion will be filename.tf.json
+
+How to terraform reads the files:
+    terraform read the files in alphabatical order.
+
+***************************************************************************************************************************
+output block:
+output.tf
+    output "ashish" {
+    value = "hello world"
+    }
+
+***************************************************************************************************************************Chapter -1 Variable and functions**************************************************************************************************************************
+Variable block:
+
+variable.tf
+        variable "username" {
+            type=string
+            default="world"
+        }
+        variable "age" {
+            type=number
+        }
+output.tf
+        output "variablevalue" {
+        value = "Hello ${var.username} and age is ${"var.age}"
+        }
+
+Passing variable through command line:
+    terraform plan -var "your-name"="ashish"
+    or
+    terraform plan -var "your-name=ashish"
+    or
+    terraform plan -var "username=arun" -var "age=40"
+
+
+2-list variable:
+    output "variablevalue" {
+        value = "Hello ${var.username[0]} "
+}
+
+variable "username" {
+    type=list
+    //default=["world"]
+}
+
+
+terraform plan -var 'username= ["ashish","arun"]'
+
+
+3-variables with the use of functions:
+
+Join function: function is used with ${}
+    output "variablevalue" {
+        value = "names are ${join("-->",var.username)} "
+        }
+    output "varname" {
+        value = "names are ${upper(var.username[0])}"
+        }
+
+    variable "username" {
+        type=list
+        }
+
+terraform plan -var 'username= ["ashish","arun"]
+
+4-map variable with lookup function
+
+    output "usersage" {
+    value = "age of ashish is ${lookup(var.usersage,"ashish")}"
+    }
+
+    variable "usersage" {
+    type=map
+    default = {
+        "ashish"=40
+        "avanish"=38
+    }
+    }
+  
+
+  How to use map variable dynamically:
+    variable "usersage" {
+        type=map
+        default = {
+            "ashish"=40
+            "avanish"=38
+        }
+        }
+
+        variable "uname" {
+        type = string
+        }
+output "usersage" {
+  value = "age of ${var.uname} is ${lookup(var.usersage,"${var.uname}")}"
+}
+terraform plan -var 'usersage={"ashish":40,"amit":38}' -var 'uname'='ashish'
+
+
+
+5-tfvars file in terraform:
+A- Priority-3
+    terraform.tfvars
+        create file with the name of terraform.tfvars. it will automatically pick the variable value
+        output.tf
+            output "userdetails" {
+                value = "username is ${var.username} and his age is ${var.age}"
+                }
+        variable.tf
+            variable "username" {
+            type = string
+            }
+
+            variable "age" {
+            type = number
+            }
+        terraform.tfvars
+            username = "ashish"
+            age = 40
+
+B- Priority-1
+custom tfvars file:
+    dev.tfvars ppte.tfvars or prod.tfvars
+        output.tf
+            output "userdetails" {
+                value = "username is ${var.username} and his age is ${var.age}"
+                }
+        variable.tf
+            variable "username" {
+            type = string
+            }
+
+            variable "age" {
+            type = number
+            }
+        terraform.tfvars
+            username = "ashish"
+            age = 40
+        development.tfvars
+             username = "arun"
+             age = 41      
+
+        terraform plan -var-file=development.tfvars   
+
+C- Priority-2
+ashish.auto.tfvars
+
+
+6-Read Environment Variable in Terraform configuration:
+    If you want to pass the value through environment variable:
+
+        output "userdetails" {
+        value = "username is ${var.username} and his age is ${var.age}"
+        }
+        variable "username" {
+        type = string
+        }
+
+        variable "age" {
+        type = number
+        }
+
+    export TF_VAR_username="ashish"
+    export TF_VAR_age=38
+    terraform plan
