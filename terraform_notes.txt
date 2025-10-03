@@ -169,3 +169,66 @@ ashish.auto.tfvars
     export TF_VAR_username="ashish"
     export TF_VAR_age=38
     terraform plan
+
+***************************************************************************************************************************Chapter -2 terraform basic commands **************************************************************************************************************************
+terraform providers: this command tell you what are the providers you are using in the current directory.
+    Note:
+        Terraform block is not mandatory, but same is recommanded.
+        When it is recommended / required: 
+            1-You want to pin provider versions
+            2-You want to specify Terraform version constraints:
+            3-You are using multiple providers
+            4-You’re working in a team
+
+ *   terraform.tfstate vs terraform.tfstate.backup:
+        terraform.tfstate is current state file. while terraform.tfstate.backup is the previous state file. if terraform.tfstate is deleted, we can recover from last state , (from terraform.tfstate.backup) just change it as terraform.tfstate
+
+    How to destroy resource id from state file and provider: but if you will not omit from configuration file at the time of applyit will also run and recreate the instance.
+        terraform destroy -target firstrepo-terraform
+
+terraform refresh:
+Note:
+    terraform state list
+    terraform state show github_repository.firstrepo-terraform  -->> only this resource state will be visible
+    terraform show: all resource state will be shown.
+
+terraform apply -refresh-only
+    terraform resfresh(deprecated) command refresh the manually changed in instance in statefile. if you want to make the same change in configuration  file, you have to manually do the same.
+
+output block: if you want to pull any resource attribute in output block, go to provider -> resource and goto argument attribute section, we can only provide the mentioned attribute which was on provider.
+    for example: https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository#full_name-1
+    Note: output block fetch the details from the state file. if state file is not available at the time of running plan, it will not pull the details.
+        even we can fetch the details such as terraform output variable_identifiername. it will fetch from state file.
+***************************************************************************************************************************Chapter -3 terraform plan ************************************************************************************************************************** 
+🔹 What happens when you run terraform plan
+            1-Load configuration
+                Terraform reads your .tf files (providers, variables, resources, modules).
+                Validates syntax and schema.
+
+            2-Initialize providers
+                Ensures required providers (AWS, GitHub, Azure, etc.) are installed and loaded.
+
+            3-Load current state
+                Terraform reads the state file (terraform.tfstate) to know what resources it thinks already exist.
+
+            4-(Optional) Refresh state
+                By default, Terraform queries the real infrastructure (via provider APIs).
+                Updates the in-memory state (not writing to file yet).
+                This helps detect drift (manual changes outside Terraform).
+                Can be skipped with -refresh=false.
+
+            5-Compare desired vs. actual
+                Compares:
+                    Desired state (your .tf config)
+                    Current state (from .tfstate + provider refresh)
+                Figures out what changes are needed to make infra match config.
+
+            6-Generate execution plan
+                Lists actions: create, update in-place, delete, or no-op.
+                Shows a diff of what will change.
+
+            7-Output plan
+                Terraform prints the plan to your terminal.
+                Optionally, you can save it with terraform plan -out=planfile.
+                This saved plan can later be applied using terraform apply planfile.
+
